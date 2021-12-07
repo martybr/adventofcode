@@ -1,0 +1,29 @@
+#!/bin/bash
+IFS=',' read -r -a list <<< "$(cat input)"
+unset IFS
+declare -i sum=0
+for i in ${list[@]}; do
+  (( sum += $i ))
+done
+floor_avg=$(( $sum / ${#list[@]} ))
+ceil_avg=$(( (10 * $sum / ${#list[@]} + 5) / 10 ))
+echo $floor_avg
+echo $ceil_avg
+
+for avg in $floor_avg $ceil_avg; do
+declare -i fuel=0
+for i in ${list[@]}; do
+  declare -i steps
+  if [ $i -gt $avg ]; then
+    steps=$(( $i - $avg ))
+  elif [ $i -lt $avg ]; then
+    steps=$(( $avg - $i ))
+  else
+    continue
+  fi
+  for x in `seq 1 $steps`; do
+    (( fuel += $x ))
+  done
+done
+echo "$avg - $fuel"
+done

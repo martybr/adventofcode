@@ -1,0 +1,28 @@
+#!/usr/local/bin/bash
+IFS=',' read -r -a fish <<< "$(cat input)"
+
+declare -a state=( 0 0 0 0 0 0 0 0 0 )
+
+for i in ${fish[@]}; do
+  (( state[$i]++ ))
+done
+
+declare -i days=80
+while [ $days -ne 0 ]; do
+  tmp=${state[0]}
+  state[0]=${state[1]}
+  state[1]=${state[2]}
+  state[2]=${state[3]}
+  state[3]=${state[4]}
+  state[4]=${state[5]}
+  state[5]=${state[6]}
+  state[6]=$(( ${state[7]} + $tmp ))
+  state[7]=${state[8]}
+  state[8]=$tmp
+  (( days-- ))
+done
+declare -i sum=0
+for i in ${state[@]}; do
+  (( sum+=$i ))
+done
+echo $sum

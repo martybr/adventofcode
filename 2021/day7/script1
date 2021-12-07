@@ -1,0 +1,20 @@
+#!/bin/bash
+IFS=',' read -r -a list <<< "$(cat input)"
+IFS=$'\n' sorted=($(sort -n <<<"${list[*]}"))
+unset IFS
+items=${#sorted[@]}
+if [ $(( items % 1 )) -eq 1 ]; then
+  median=${sorted[$(( items / 2))]}
+else
+  median=$(( ( ${sorted[$(( items / 2))]} + ${sorted[$(( items / 2 - 1 ))]}  ) / 2 ))
+fi
+
+declare -i fuel=0
+for i in ${sorted[@]}; do
+  if [ $i -gt $median ]; then
+    (( fuel = fuel + ($i - $median) ))
+  elif [ $i -lt $median ]; then
+    (( fuel = fuel + ($median - $i) ))
+  fi
+done
+echo $fuel
