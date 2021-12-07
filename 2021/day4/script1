@@ -63,6 +63,7 @@ check_for_bingo () {
   echo 0
 }
 
+echo "Playing..."
 for i in ${bingonumbers[@]}; do
   mark_bingo_number $i
   bingo=$(check_for_bingo)
