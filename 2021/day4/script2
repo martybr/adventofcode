@@ -75,7 +75,6 @@ for i in ${bingonumbers[@]}; do
         for x in `seq 0 4`; do
           lastboard["$y,$x"]=${boards["$lastbingo,$y,$x"]}
         done
-        echo
       done
       unset non_bingo_boards[$((bingo - 1))]
     else
