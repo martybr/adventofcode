@@ -21,18 +21,6 @@ while read line; do
   (( y++ ))
 done <<< "$(tail +3 input)"
 
-print_boards () {
-  for b in `seq 1 $board`; do
-    for y in `seq 0 4`; do
-      for x in `seq 0 4`; do
-        printf "%2d " ${boards["$b,$y,$x"]}
-      done
-      echo
-    done
-    echo
-  done
-}
-
 mark_bingo_number () {
   drawnnumber=$1
   for b in `seq 1 $board`; do
@@ -85,13 +73,11 @@ for i in ${bingonumbers[@]}; do
       declare -A lastboard=()
       for y in `seq 0 4`; do
         for x in `seq 0 4`; do
-          printf "%2d " ${boards["$lastbingo,$y,$x"]}
           lastboard["$y,$x"]=${boards["$lastbingo,$y,$x"]}
         done
         echo
       done
       unset non_bingo_boards[$((bingo - 1))]
-      echo ${non_bingo_boards[@]}
     else
       break
     fi
