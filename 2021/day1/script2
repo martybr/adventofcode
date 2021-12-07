@@ -1,0 +1,13 @@
+#!/bin/bash
+values=( $(cat input) )
+(( max=${#values[@]}-4 ))
+count=0
+(( prev=${values[0]}+${values[1]}+${values[2]} ))
+for i in `seq 0 $max`; do
+  (( total=${values[$i+1]}+${values[$i+2]}+${values[$i+3]} ))
+  if [ $total -gt $prev ]; then
+    (( count++ ))
+  fi
+  prev=$total
+done
+echo $count

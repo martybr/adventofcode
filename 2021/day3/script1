@@ -1,0 +1,31 @@
+#!/bin/bash
+
+declare -a diag=( $(cat input) )
+items=$(( ${#diag[@]} -1 ))
+bitlen=${#diag[0]}
+
+count() {
+  declare -i count=0
+  declare -i pos=$1
+  shift
+  halfitems=$(( $# / 2 ))
+  for i in $@; do
+    if [ ${i:$pos:1} == "1" ]; then
+      (( count++ ))
+    fi
+  done  
+  if [ $count -lt $halfitems ]; then
+    echo -n "0"
+  else
+    echo -n "1"
+  fi
+}
+
+
+gamma=$( for pos in `seq 0 $(( bitlen - 1 ))`; do
+  count $pos ${diag[@]}
+done
+echo)
+gamma=$((2#$gamma))
+epsilon=$(( $gamma ^ $(( (1<<$bitlen) - 1 )) ))
+echo $(( $gamma * $epsilon ))

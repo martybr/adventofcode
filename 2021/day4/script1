@@ -1,0 +1,84 @@
+#!/usr/local/bin/bash
+echo "Reading bingo numbers..."
+IFS="," read -r -a bingonumbers <<< "$(head -1 input)"
+
+echo "Reading boards..."
+declare -i board=1
+declare -A boards
+declare -i x=0
+declare -i y=0
+declare -a row
+while read line; do
+  if [ "$line" == "" ]; then
+    (( board++ ))
+    (( y=0 ))
+    continue
+  fi
+  read -r -a row <<< "$line"
+  for x in `seq 0 4`; do
+    boards["$board,$y,$x"]=${row[$x]}
+  done
+  (( y++ ))
+done <<< "$(tail +3 input)"
+
+print_boards () {
+  for b in `seq 1 $board`; do
+    for y in `seq 0 4`; do
+      for x in `seq 0 4`; do
+        printf "%2d " ${boards["$b,$y,$x"]}
+      done
+      echo
+    done
+    echo
+  done
+}
+
+mark_bingo_number () {
+  drawnnumber=$1
+  for b in `seq 1 $board`; do
+    for y in `seq 0 4`; do
+      for x in `seq 0 4`; do
+        if [ ${boards["$b,$y,$x"]} -eq $drawnnumber ]; then
+          (( boards["$b,$y,$x"]=-1 ))
+        fi
+      done
+    done
+  done
+}
+
+check_for_bingo () {
+  for b in `seq 1 $board`; do
+    # Check for horizontal
+    for y in `seq 0 4`; do
+      declare -i sum=0
+      for x in `seq 0 4`; do 
+        (( sum=sum+${boards["$b,$y,$x"]} ))
+      done
+      if [ $sum -lt 0 ]; then
+        echo $b
+        return
+      fi
+    done
+  done
+  echo 0
+}
+
+for i in ${bingonumbers[@]}; do
+  mark_bingo_number $i
+  bingo=$(check_for_bingo)
+  if [ $bingo -gt 0 ]; then
+    echo "Bingo on board $bingo"
+    lastdraw=$i
+    break
+  fi
+done
+
+declare -i sum=0
+for y in `seq 0 4`; do
+  for x in `seq 0 4`; do
+    if [ ${boards["$bingo,$y,$x"]} -ge 0 ]; then
+      (( sum=sum+${boards["$bingo,$y,$x"]} ))
+    fi
+  done
+done
+echo $(( $sum * $lastdraw))

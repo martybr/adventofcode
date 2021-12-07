@@ -1,0 +1,17 @@
+#!/bin/bash
+declare -i x=0 z=0
+while read cmd step; do
+  case $cmd in
+    forward)
+      (( x = x + $step ))
+      ;;
+    down)
+      (( z = z + $step ))
+      ;;
+    up)
+      (( z = z - $step ))
+      ;;
+  esac
+done <<< "$(cat input)"
+echo $(( x * z ))
+

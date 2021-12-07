@@ -1,0 +1,61 @@
+#!/bin/bash
+
+declare -a diag=( $(cat input) )
+items=$(( ${#diag[@]} -1 ))
+bitlen=${#diag[0]}
+
+count() {
+  declare -i count=0
+  declare -i pos=$1
+  shift
+  declare -i searchbit=$1
+  declare -i invertedbit=$(( 1 - $searchbit ))
+  shift
+  items=$#
+  halfitems=$(( $# / 2 ))
+  for i in $@; do
+    if [ ${i:$pos:1} == "1" ]; then
+      (( count++ ))
+    fi
+  done
+  if [ $(( $items - $count )) -lt $halfitems ]; then
+    echo -n "$searchbit"
+  elif [ $(( $items - $count )) -gt $halfitems ]; then
+    echo -n "$invertedbit"
+  else
+    echo -n "$searchbit"
+  fi
+}
+
+filter() {
+  bit=$1
+  shift
+  pos=$1
+  shift
+  for i in $@; do
+    if [ ${i:$pos:1} == $bit ]; then
+      echo $i
+    fi
+  done
+}
+
+list=${diag[@]}
+for pos in `seq 0 $(( bitlen -1 ))`; do
+  searchbit=$(count $pos 1 ${list[@]})
+  list=($(filter $searchbit $pos ${list[@]}))
+  if [ ${#list[@]} -eq 1 ]; then
+    break
+  fi
+done
+oxygen=$list
+
+list=${diag[@]}
+for pos in `seq 0 $(( bitlen -1 ))`; do
+  searchbit=$(count $pos 0 ${list[@]})
+  list=($(filter $searchbit $pos ${list[@]}))
+  if [ ${#list[@]} -eq 1 ]; then
+    break
+  fi
+done
+co2scrub=$list
+echo $(( $((2#$oxygen)) * $((2#$co2scrub)) ))

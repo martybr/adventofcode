@@ -1,0 +1,11 @@
+#!/bin/bash
+count=-1
+prev=0
+while read i; do
+  if [ $i -gt $prev ]
+  then
+    (( count++ ))
+  fi
+  prev=$i
+done <<< "$(cat input)"
+echo $count
