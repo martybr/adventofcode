@@ -47,8 +47,7 @@ mark_bingo_number () {
 }
 
 check_for_bingo () {
-  for b in `seq 1 $board`; do
-    # Check for horizontal
+  for b in $@; do
     for y in `seq 0 4`; do
       declare -i sum=0
       for x in `seq 0 4`; do 
@@ -59,10 +58,9 @@ check_for_bingo () {
         return
       fi
     done
-    # Check for vertical
     for x in `seq 0 4`; do
       declare -i sum=0
-      for y in `seq 0 4`; do 
+      for y in `seq 0 4`; do
         (( sum=sum+${boards["$b,$y,$x"]} ))
       done
       if [ $sum -lt 0 ]; then
@@ -74,22 +72,34 @@ check_for_bingo () {
   echo 0
 }
 
+declare -a non_bingo_boards=($(seq 1 $board))
+
 echo "Playing..."
 for i in ${bingonumbers[@]}; do
   mark_bingo_number $i
-  bingo=$(check_for_bingo)
+  bingo=$(check_for_bingo ${non_bingo_boards[@]})
   if [ $bingo -gt 0 ]; then
     echo "Bingo on board $bingo"
     lastdraw=$i
-    break
+    lastbingo=$bingo
+    declare -A lastboard=()
+    for y in `seq 0 4`; do
+      for x in `seq 0 4`; do
+        lastboard["$y,$x"]=${boards["$lastbingo,$y,$x"]}
+      done
+    done
+    unset non_bingo_boards[$((bingo - 1))]
+    if [ ${#non_bingo_boards[@]} -eq 0 ]; then
+      break
+    fi
   fi
 done
 
 declare -i sum=0
 for y in `seq 0 4`; do
   for x in `seq 0 4`; do
-    if [ ${boards["$bingo,$y,$x"]} -ge 0 ]; then
-      (( sum=sum+${boards["$bingo,$y,$x"]} ))
+    if [ ${lastboard["$y,$x"]} -ge 0 ]; then
+      (( sum=sum+${lastboard["$y,$x"]} ))
     fi
   done
 done
